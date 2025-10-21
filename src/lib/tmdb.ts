@@ -1,8 +1,4 @@
-import "server-only";
-import type {
-  TMDbResponse,
-  TMDbBrowseKind,
-} from "@/types/tmdb";
+import type { TMDbResponse, TMDbBrowseKind } from "@/types/tmdb";
 
 const TMDB_API = "https://api.themoviedb.org/3";
 
