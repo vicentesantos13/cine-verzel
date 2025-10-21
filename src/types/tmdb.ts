@@ -11,9 +11,12 @@ export type TMDbSearchResponse = {
   results: TMDbMovie[];
 };
 
-export type TMDbTrendingResponse = {
+export type TMDbResponse = {
   page: number;
   results: TMDbMovie[];
   total_pages: number;
   total_results?: number;
 };
+
+
+export type TMDbBrowseKind = "popular" | "top_rated" | "upcoming" | "now_playing";
