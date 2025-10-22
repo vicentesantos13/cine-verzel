@@ -1,6 +1,7 @@
 "use client";
 
 import type { TMDbBrowseKind } from "@/types/tmdb";
+import Link from "next/link";
 
 interface Props {
   active:
@@ -56,6 +57,11 @@ export default function CatalogTabs({
         onClick={() => onTrending("week")}
         pending={pending}
       />
+      <Link href={"/my-favorites"}>
+        <button className="rounded-lg border px-3 py-2 text-sm cursor-pointer hover:bg-slate-400">
+          Meus Favoritos
+        </button>
+      </Link>
     </div>
   );
 }
