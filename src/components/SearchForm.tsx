@@ -32,21 +32,30 @@ export default function SearchForm({
         await onSubmit(values);
         reset({ q: "" });
       })}
-      className="flex gap-2"
+      className="flex flex-wrap gap-2"
     >
       <input
         {...register("q")}
         placeholder="Busque por título (ex: Inception)"
-        className="w-full rounded-xl border px-4 py-3 outline-none focus:ring"
+        className="w-full rounded-xl border px-4 py-3 outline-none focus:ring sm:flex-1"
       />
       <button
         type="submit"
         disabled={isSubmitting || pending}
-        className="rounded-xl bg-black px-5 py-3 text-white disabled:opacity-50"
+        className="rounded-xl bg-black px-5 py-3 text-white disabled:opacity-50 hover:bg-slate-400 cursor-pointer border"
       >
         {isSubmitting || pending ? "Buscando..." : "Buscar"}
       </button>
-      {errors.q && <p className="text-sm text-red-600">{errors.q.message}</p>}
+
+      {errors.q && (
+        <p
+          className="basis-full text-sm text-red-600 mt-1"
+          aria-live="polite"
+          role="alert"
+        >
+          {errors.q.message}
+        </p>
+      )}
     </form>
   );
 }

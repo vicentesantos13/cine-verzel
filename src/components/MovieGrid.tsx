@@ -4,21 +4,26 @@ import MovieCard from "./MovieCard";
 
 interface Props {
   movies: TMDbMovie[];
-  favorites?: ReadonlySet<number>;
+  favoritesIds?: ReadonlySet<number>;
   onAdd: (movie: TMDbMovie) => void;
   onRemove: (movie: TMDbMovie) => void;
   isLoading?: boolean;
   emptyMessage?: string;
+  pendingIds?: ReadonlySet<number>; 
 }
 
 function MovieGridBase({
   movies,
-  favorites = new Set<number>(),
+  favoritesIds,
   onAdd,
   onRemove,
   isLoading = false,
   emptyMessage = "Nenhum filme encontrado.",
+  pendingIds
 }: Props) {
+  const favSet = favoritesIds ?? new Set<number>();
+
+
   if (isLoading && movies.length === 0) {
     return (
       <section
@@ -46,9 +51,10 @@ function MovieGridBase({
         <MovieCard
           key={m.id}
           movie={m}
-          isFavorite={favorites.has(m.id)}
+          favoriteMovieId={favSet.has(m.id) ? m.id : undefined}
           onAdd={() => onAdd(m)}
           onRemove={() => onRemove(m)}
+          disableActions={pendingIds?.has(m.id) ?? false}
         />
       ))}
     </section>

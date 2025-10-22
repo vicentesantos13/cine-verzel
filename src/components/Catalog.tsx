@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import type { TMDbBrowseKind, TMDbResponse } from "@/types/tmdb";
+import type { TMDbBrowseKind, TMDbMovie, TMDbResponse } from "@/types/tmdb";
 import CatalogTabs from "./CatalogTabs";
 import SearchForm from "./SearchForm";
 import MovieGrid from "./MovieGrid";
@@ -20,6 +20,9 @@ export default function CatalogClient() {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
+  const [favIds, setFavIds] = useState<ReadonlySet<number>>(new Set());
+  const [pendingIds, setPendingIds] = useState<ReadonlySet<number>>(new Set());
+
   const apiUrl = useMemo(() => {
     if (state.type === "browse")
       return `/api/tmdb/browse?kind=${state.kind}&page=${state.page}`;
@@ -29,6 +32,71 @@ export default function CatalogClient() {
       state.page
     }`;
   }, [state]);
+
+  async function addFavorite(m: TMDbMovie) {
+    setFavIds((prev) => new Set([...prev, m.id]));
+    markPending(m.id, true);
+
+    try {
+      const res = await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          movieId: m.id,
+          title: m.title,
+          posterPath: m.poster_path ?? null,
+          overview: m.overview ?? null,
+          voteAverage: m.vote_average,
+          releaseDate: m.release_date ?? null,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (e) {
+      setFavIds((prev) => {
+        const n = new Set(prev);
+        n.delete(m.id);
+        return n;
+      });
+      console.error("Falha ao favoritar:", e);
+    } finally {
+      markPending(m.id, false);
+    }
+  }
+
+  async function deleteFavorite(m: TMDbMovie) {
+    setFavIds((prev) => {
+      const n = new Set(prev);
+      n.delete(m.id);
+      return n;
+    });
+    markPending(m.id, true);
+
+    try {
+      const res = await fetch("/api/favorites", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ movieId: m.id }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch (e) {
+      setFavIds((prev) => new Set([...prev, m.id]));
+      console.error("Falha ao remover favorito:", e);
+    } finally {
+      markPending(m.id, false);
+    }
+  }
+
+  function markPending(id: number, on: boolean) {
+    setPendingIds((prev) => {
+      const n = new Set(prev);
+      if (on) {
+        n.add(id);
+      } else {
+        n.delete(id);
+      }
+      return n;
+    });
+  }
 
   useEffect(() => {
     let alive = true;
@@ -46,10 +114,20 @@ export default function CatalogClient() {
         setData({ page: 1, results: [], total_pages: 1, total_results: 0 });
       }
     })();
+
     return () => {
       alive = false;
     };
   }, [apiUrl]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/favorites", { cache: "no-store" });
+      if (!res.ok) return;
+      const json: { items: { movieId: number }[] } = await res.json();
+      setFavIds(new Set(json.items.map((i) => i.movieId)));
+    })();
+  }, []);
 
   const setBrowse = (kind: TMDbBrowseKind) =>
     start(() => setState({ type: "browse", kind, page: 1 }));
@@ -74,29 +152,27 @@ export default function CatalogClient() {
         pending={pending}
         onBrowse={setBrowse}
         onTrending={setTrending}
-        onSearch={() => setSearch("")}
       />
 
-      {state.type === "search" && (
-        <SearchForm
-          key={state.q}
-          defaultQuery={state.q}
-          pending={pending}
-          onSubmit={({ q }) => setSearch(q)}
-        />
-      )}
+      <SearchForm
+        key={state.type === "search" ? state.q : "always"}
+        defaultQuery={state.type === "search" ? state.q : ""}
+        pending={pending}
+        onSubmit={({ q }) => setSearch(q)}
+      />
 
       {pending && <p className="my-2 text-sm opacity-70">Carregando…</p>}
       {error && <p className="my-2 text-sm text-red-600">Erro: {error}</p>}
 
       <MovieGrid
         movies={data?.results ?? []}
-        // favorites={favSet}
+        favoritesIds={favIds}
+        pendingIds={pendingIds}
         onAdd={(m) => {
-          /* chamar api aqui */
+          addFavorite(m);
         }}
         onRemove={(m) => {
-          /* chamar api aqui */
+          deleteFavorite(m);
         }}
       />
 

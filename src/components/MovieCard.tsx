@@ -5,12 +5,19 @@ import { memo } from "react";
 
 interface Props {
   movie: TMDbMovie;
-  isFavorite: boolean;
+  favoriteMovieId?: number;
   onAdd: () => void;
   onRemove: () => void;
+  disableActions?: boolean;
 }
 
-function MovieCardBase({ movie, isFavorite, onAdd, onRemove }: Props) {
+function MovieCardBase({
+  movie,
+  favoriteMovieId,
+  onAdd,
+  onRemove,
+  disableActions,
+}: Props) {
   const src = tmdbImage(movie.poster_path, "w300");
 
   return (
@@ -20,7 +27,7 @@ function MovieCardBase({ movie, isFavorite, onAdd, onRemove }: Props) {
           src={src}
           alt={movie.title}
           width={300}
-          height={450} 
+          height={450}
           className="mb-2 w-full rounded-lg h-auto"
         />
       ) : (
@@ -35,13 +42,14 @@ function MovieCardBase({ movie, isFavorite, onAdd, onRemove }: Props) {
 
       <div className="mt-1 flex items-center justify-between">
         <span className="text-sm">
-          ⭐ <b className="text-lg">{movie.vote_average.toFixed(1)}</b>
+          ⭐ <b className="text-lg">{movie.vote_average.toFixed(1)}/10</b>
         </span>
 
-        {isFavorite ? (
+        {favoriteMovieId === movie.id ? (
           <button
             onClick={onRemove}
-            className="rounded-lg border px-3 py-1 text-sm"
+            disabled={disableActions}
+            className="rounded-lg bg-red-600 text-white border px-3 py-1 text-sm cursor-pointer"
             aria-label={`Remover ${movie.title} dos favoritos`}
           >
             Remover
@@ -49,7 +57,8 @@ function MovieCardBase({ movie, isFavorite, onAdd, onRemove }: Props) {
         ) : (
           <button
             onClick={onAdd}
-            className="rounded-lg bg-black px-3 py-1 text-sm text-white"
+            disabled={disableActions}
+            className="rounded-lg bg-black px-3 py-1 text-sm text-white cursor-pointer"
             aria-label={`Adicionar ${movie.title} aos favoritos`}
           >
             Favoritar

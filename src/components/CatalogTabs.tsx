@@ -10,7 +10,6 @@ interface Props {
   pending: boolean;
   onBrowse: (kind: TMDbBrowseKind) => void;
   onTrending: (window: "day" | "week") => void;
-  onSearch: () => void;
 }
 
 export default function CatalogTabs({
@@ -18,7 +17,6 @@ export default function CatalogTabs({
   pending,
   onBrowse,
   onTrending,
-  onSearch,
 }: Props) {
   return (
     <div className="mb-4 flex flex-wrap gap-2">
@@ -29,39 +27,33 @@ export default function CatalogTabs({
         pending={pending}
       />
       <Tab
-        label="Top Rated"
+        label="Melhores Notas"
         active={active.type === "browse" && active.kind === "top_rated"}
         onClick={() => onBrowse("top_rated")}
         pending={pending}
       />
       <Tab
-        label="Now Playing"
+        label="Em exibição"
         active={active.type === "browse" && active.kind === "now_playing"}
         onClick={() => onBrowse("now_playing")}
         pending={pending}
       />
       <Tab
-        label="Upcoming"
+        label="Em Breve"
         active={active.type === "browse" && active.kind === "upcoming"}
         onClick={() => onBrowse("upcoming")}
         pending={pending}
       />
       <Tab
-        label="Trending (Dia)"
+        label="Em alta (Dia)"
         active={active.type === "trending" && active.window === "day"}
         onClick={() => onTrending("day")}
         pending={pending}
       />
       <Tab
-        label="Trending (Semana)"
+        label="Em alta (Semana)"
         active={active.type === "trending" && active.window === "week"}
         onClick={() => onTrending("week")}
-        pending={pending}
-      />
-      <Tab
-        label="Pesquisar"
-        active={active.type === "search"}
-        onClick={onSearch}
         pending={pending}
       />
     </div>
@@ -84,8 +76,8 @@ function Tab({
       type="button"
       onClick={onClick}
       disabled={pending}
-      className={`rounded-lg border px-3 py-2 text-sm ${
-        active ? "bg-black text-white" : "hover:bg-gray-50"
+      className={`rounded-lg border px-3 py-2 text-sm cursor-pointer ${
+        active ? "bg-slate-400 text-white" : "hover:bg-slate-400"
       } ${pending ? "opacity-60" : ""}`}
     >
       {label}

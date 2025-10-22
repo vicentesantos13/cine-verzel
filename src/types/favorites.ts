@@ -30,3 +30,20 @@ export type FavoriteListDTO = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+
+export type FavoriteListItemDTO = {
+  id: string;
+  listId: string;
+  movieId: number;
+  title: string;
+  posterPath: string | null;
+  overview: string | null;
+  voteAverage: number;
+  releaseDate: string | null;
+};
+
+export type FavoriteListResponse = {
+  id: string;
+  items: FavoriteListItemDTO[];
+};
