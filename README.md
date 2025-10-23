@@ -1,4 +1,3 @@
-
 ## Cine-Verzel — Lista de Filmes (TMDb)
 
 Aplicação full-stack para **buscar filmes** na API do  **TMDb** , **favoritar** títulos e **compartilhar** a lista por um link público
@@ -8,7 +7,7 @@ Aplicação full-stack para **buscar filmes** na API do  **TMDb** , **favoritar*
 * **Back-end:** Rotas de API do Next.js (Node.js)
 * **Banco:** Prisma + SQLite (dev) — facilmente trocável por Postgres/MySQL
 * **Empacotamento:** Turbopack
-* **Gerenciador:** **npm** 
+* **Gerenciador:** **npm**
 
 ## Funcionalidades
 
@@ -63,8 +62,6 @@ prisma/
 
 ```
 
-
-
 ## Pré-requisitos
 
 * Node.js 18+
@@ -72,7 +69,6 @@ prisma/
 * Conta no TMDb (para  **API Key** )
 
 ## Configuração
-
 
 #### 1) Clone & deps
 
@@ -82,7 +78,6 @@ cd cine-verzel
 npm install
 
 ```
-
 
 ### 2) Variáveis de ambiente
 
@@ -96,7 +91,7 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/nomedobanco?schema=p
 TMDB_API_KEY="SUA_CHAVE_TMDB"
 
 # (opcional) URL absoluta do deploy — usada em compartilhamento
-# NEXT_PUBLIC_BASE_URL="https://seu-deploy.vercel.app" #URL local"http://localhost:3000"
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 
 ```
 
@@ -107,8 +102,6 @@ npx prisma generate
 npx prisma migrate dev --name init
 
 ```
-
-
 
 ### 4) Rodar em desenvolvimento
 
@@ -127,8 +120,6 @@ npx prisma migrate dev --name init
 }
 
 ```
-
-
 
 ## Rotas principais
 
@@ -168,18 +159,13 @@ npx prisma migrate dev --name init
 
   Retorna a lista por `id`. **Atenção Next 15:** no handler use `const { id } = await ctx.params;`.
 
-
-
 ## Por que cookie?
 
 * Vinculamos a **lista ao navegador** sem autenticação.
 * Cookie **httpOnly** → não acessível no client, só no servidor.
 * O link público `/list/[id]` permite compartilhar sem expor o cookie.
 
-
-
 ## Prisma — Modelos
-
 
 ```
 model FavoriteList {
@@ -201,7 +187,6 @@ model FavoriteList {
 }
 ```
 
-
 ## Páginas
 
 * **`/`** – Catálogo (SSR + client island `CatalogClient`):
@@ -209,7 +194,6 @@ model FavoriteList {
   Abas SPA, `SearchForm` (RHF + Zod), `MovieGrid`/`MovieCard`,  **UI otimista** .
 * **`/my-favorites`** – Lê o cookie no server e renderiza `FavoritesSection` (client) com botão  **Copiar Link** .
 * **`/list/[id]`** – Página pública (SSR + `FavoritesSection` reaproveitado em modo read-only).
-
 
 ## Config do `next/image`
 
@@ -237,8 +221,6 @@ export default nextConfig;
 
 ```
 
-
-
 ## Decisões técnicas
 
 * **Next 15 App Router** e separação Server/Client para desempenho e DX.
@@ -247,7 +229,6 @@ export default nextConfig;
 * **UI otimista** com `Set<number>` para ids favoritados + rollback em erro.
 * **Rotas mínimas** : `/api/favorites` (dono) e `/api/lists/[id]` (pública).
 * **Cookie httpOnly** para persistir a lista sem autenticação.
-
 
 ## Troubleshooting
 
@@ -264,6 +245,19 @@ export default nextConfig;
 
   Garanta **UI otimista** e desabilite o botão enquanto a request está pendente.
 
+
+## Deploy em Produção
+
+Este projeto está publicado em: **https://cine-verzel.vercel.app/**
+
+- **Hospedagem do app:** Vercel (Next.js)
+- **Banco de dados:** **PostgreSQL no Neon** (serverless)
+
+Observações:
+
+- O Neon é serverless; em planos gratuitos, pode haver *cold start* do banco (primeiro acesso após inatividade pode levar alguns segundos).
+- As variáveis sensíveis estão configuradas no painel da Vercel (por exemplo, `DATABASE_URL` apontando para o Neon e `TMDB_API_KEY`).
+- Migrações são aplicadas com `npx prisma migrate deploy` durante/apos o deploy.
 
 
 ## Licença
