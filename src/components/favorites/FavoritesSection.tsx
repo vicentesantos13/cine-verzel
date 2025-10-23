@@ -5,6 +5,7 @@ import Link from "next/link";
 import CopyButton from "@/components/CopyButton";
 import FavoriteItemCard from "./FavoriteItemCard";
 import type { FavoriteListResponse } from "@/types/favorites";
+import { usePathname } from "next/navigation";
 
 interface Props {
   listId: string | null;
@@ -13,26 +14,29 @@ interface Props {
 export default function FavoritesSection({ listId }: Props) {
   const [list, setList] = useState<FavoriteListResponse>();
 
+  const pathname = usePathname();
+
+  // mostra o botão apenas em /my-favorites
+  const showCopyButton = pathname === "/my-favorites";
+
   const shareUrl = useMemo(() => {
     if (!listId) return "";
     return `/list/${listId}`;
-    
   }, [listId]);
 
   useEffect(() => {
     const fetchFavoriteList = async () => {
       if (listId) {
         const res = await fetch(`/api/lists/${listId}`);
-        if(!res.ok){
-          return ;
+        if (!res.ok) {
+          return;
         }
-        const data = await res.json()
+        const data = await res.json();
         setList(data);
-        
-
       }
     };
     fetchFavoriteList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!list) {
@@ -52,9 +56,11 @@ export default function FavoritesSection({ listId }: Props) {
 
   return (
     <>
-      <div className="mb-4 flex items-center gap-3">
-        <CopyButton url={shareUrl} />
-      </div>
+      {showCopyButton && shareUrl && (
+        <div className="mb-4 flex items-center gap-3">
+          <CopyButton url={shareUrl} />
+        </div>
+      )}
 
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {list.items.map((it) => (
