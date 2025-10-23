@@ -7,6 +7,10 @@ async function getMyListId(): Promise<string | null> {
   return jar.get("fav_list_id")?.value ?? null;
 }
 
+export const metadata = {
+  title: "Meus Favoritos",
+};
+
 export default async function Page() {
   const listId = await getMyListId();
 
