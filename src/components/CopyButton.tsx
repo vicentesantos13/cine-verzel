@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 
-const BASE_URL = "http://localhost:3000"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 export default function CopyButton({ url }: { url: string }) {
+  
   const [copied, setCopied] = useState(false);
   async function copy() {
     try {
+      console.log(BASE_URL);
+      
       await navigator.clipboard.writeText(BASE_URL+url);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
