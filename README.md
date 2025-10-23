@@ -113,7 +113,7 @@ npx prisma migrate dev --name init
 {
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && prisma migrate && next build --turbopack",
     "start": "next start",
     "lint": "next lint",
   }
@@ -245,7 +245,6 @@ export default nextConfig;
 
   Garanta **UI otimista** e desabilite o botão enquanto a request está pendente.
 
-
 ## Deploy em Produção
 
 Este projeto está publicado em: **https://cine-verzel.vercel.app/**
@@ -258,7 +257,6 @@ Observações:
 - O Neon é serverless; em planos gratuitos, pode haver *cold start* do banco (primeiro acesso após inatividade pode levar alguns segundos).
 - As variáveis sensíveis estão configuradas no painel da Vercel (por exemplo, `DATABASE_URL` apontando para o Neon e `TMDB_API_KEY`).
 - Migrações são aplicadas com `npx prisma migrate deploy` durante/apos o deploy.
-
 
 ## Licença
 
